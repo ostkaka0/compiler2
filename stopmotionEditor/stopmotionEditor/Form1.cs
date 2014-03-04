@@ -98,7 +98,7 @@ namespace stopmotionEditor
             {
                 try
                 {
-                    Bitmap bitmap = new Bitmap((listBox.SelectedItem as PictureItem).path);
+                    Bitmap bitmap = new Bitmap(Image.FromFile((listBox.SelectedItem as PictureItem).path), new Size(1280, 720));
                     bitmap.RotateFlip(RotateFlipType.RotateNoneFlipXY);
                     //bitmap.RotateFlip(RotateFlipType.Rotate180FlipNone);
                     pictureBox.Image = bitmap;
@@ -183,6 +183,8 @@ namespace stopmotionEditor
 
                     try
                     {
+                        Size size = new Size(1280, 720);
+
                         Console.WriteLine(path);
 
                         //sourcePath = openFile();
@@ -201,7 +203,7 @@ namespace stopmotionEditor
                         }));
 
                         //load the first image
-                        Bitmap bitmap = (Bitmap)Image.FromFile(jpgFileList.First().path);
+                        Bitmap bitmap = new Bitmap(Image.FromFile(jpgFileList.First().path), size);
 
                         bitmap.RotateFlip(RotateFlipType.RotateNoneFlipXY);
 
@@ -216,7 +218,7 @@ namespace stopmotionEditor
                         jpgFileList.Skip(1).ToList().ForEach(file =>
                         {
                             Console.WriteLine(file);
-                            bitmap = new Bitmap(Bitmap.FromFile(file.path));
+                            bitmap = new Bitmap(Bitmap.FromFile(file.path), size);
                             bitmap.RotateFlip(RotateFlipType.RotateNoneFlipXY);
 
                             aviStream.AddFrame(bitmap);
