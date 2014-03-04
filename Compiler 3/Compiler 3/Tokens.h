@@ -1,73 +1,8 @@
 #include <string>
+#include <vector>
+#include <iostream>
 
 class Token;
-
-#define SINGLE_ARG(...) __VA_ARGS__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////// Metaprogrammerad kod under test ///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define ENUM_CLASS(_name,_enum,_enumstring) \
-class _name : public Token\
-{\
-public:\
-	static enum Enum\
-	{
-		_enum,\
-		_ENUM_END\
-	};\
-	static std::string *enumstrings;\
-	_name::Enum Value;\
-	\
-	_name(_name::Enum value)\
-	{\
-		Value = value;\
-	}\
-	\
-	static void init()\
-	{\
-		_name::enumstrings = new std::string[_name::Enum::_ENUM_END];\
-		std::string tempstring[] = { _enumstring };\
-		_name::enumstrings = tempstring;\
-	}\
-
-	virtual Token *Create(std::string str)\
-	{\
-		for (unsigned char i = 0; i < _name::Enum::_ENUM_END; ++i)\
-			{\
-				if (enumstrings[i] == str)\
-				{\
-					return new _name(static_cast<_name::Enum>(i));\
-				}\
-			}\
-			return nullptr;\
-	}\
-}
-/*class _name : public Token\
-{\
-public:\
-	static enum Enum\
-	{\
-		_enum\
-	};\
-	static char** enumstring = { _enumstring };\
-	_name::Enum Value;\
-	_name(_name::Enum value)\
-	{\
-		Value = value;\
-	}\
-	virtual Token *Create(char *str)\
-	{\
-		for (size_t i = 0; i < sizeof(*enumstring); ++i)\/*for(char* i = enumstring; i < sizeof(*enumstring); i++)\*-/
-			{\
-				if (*i == *str)\
-				{\
-					return new _name(i-*enumstring);\
-				}\
-			}\
-			return nullptr;\
-	}\
-}*/
 
 class Token
 {
@@ -79,63 +14,104 @@ public:
 /////////////////////////////////// Test code ///////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*class _name : public Token
+enum ETokenOperator
 {
+	NOT = 0,			BNOT,				EQUAL,			NOTEQUAL,		SHIFTLEFT,	SHIFTRIGHT,	OR,			AND,
+	XOR,				PLUS,				MINUS,			MULTIPLY,		DIVIDE,		MODULO,		BOR,		BAND,
+	SHIFTLEFTEQUAL,		SHIFTRIGHTEQUAL,	OREQUAL,		ANDEQUAL,		XOREQUAL,	PLUSEQUAL,	MINUSEQUAL,	MULTIPLYEQUAL,
+	DIVIDEEQUAL,		MODULOEQUAL,		BOREQUAL,		BANDEQUAL,		QUESTION,	COLON,		SEMICOLON,
+
+	LEFTPARENTHESIS,	RIGHTPARENTHESIS,	LEFTCURLYBRACE,		RIGHTCURLYBRACE,
+	LEFTSQUAREBRACKET,	RIGHTSQUAREBRACKET,	LEFTANGLEBRACKET,	RIGHTANGLEBRACKET
+};
+
+std::string TokenOperatorNames[] =
+{
+	"~",				"!",				"==",			"!=",			"<<",		">>",		"|",		"&",
+	"^",				"+",				"-",			"*",			"/",		"%",		"||",		"&&",
+	"<<=",				">>=",				"|=",			"&=",			"^=",		"+=",		"-=",		"*=",
+	"/=",				"%=",				"||=",			"&&=",			"?",		":",		";",
+
+	"(",				")",				"{",				"}",
+	"[",				"]",				"<",				">",
+};
+
+class TokenOperator : public Token
+{
+	ETokenOperator tokenOperator;
 public:
-	static enum Enum
+	TokenOperator(std::string text)
 	{
-		a= 0,
-		_ENUM_END
-	};
-	static std::string *enumstrings;
-	_name::Enum Value;
-	
-	_name(_name::Enum value)
-	{
-		Value = value;
+		for (int i = 0; i < sizeof(TokenOperatorNames); i++)
+		{
+			if (TokenOperatorNames[i] == text)
+			{
+				tokenOperator = (ETokenOperator)i;
+			}
+			return;
+		}
+
+		std::cout << "Invalid operator: " << text << ".\n";
+		std::cerr << "Invalid operator: " << text << ".\n";
+		std::cin.get();
+		exit(-1);
 	}
-	
-	static void init()
+
+	ETokenOperator getOperator()
 	{
-		_name::enumstrings = new std::string[_name::Enum::_ENUM_END];
-		std::string tempstring[] = {"_enumstring"};
-		_name::enumstrings = tempstring;
+		return tokenOperator;
 	}
 
 	virtual Token *Create(std::string str)
 	{
-		for (unsigned char i = 0; i < _name::Enum::_ENUM_END; ++i)
-			{
-				if (enumstrings[i] == str)
-				{
-					return new _name(static_cast<_name::Enum>(i));
-				}
-			}
-			return nullptr;
+		
 	}
-};*/
+};
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-//Under test->
-
-//ENUM_CLASS(TESTMOJDFS, AETT, "AETT");
-
-ENUM_CLASS(tOperator,
-		   SINGLE_ARG(
-		   NOT = 0,			BNOT,				EQUAL,			NOTEQUAL,		SHIFTLEFT,	SHIFTRIGHT,	OR,			AND,
-		   XOR,				PLUS,				MINUS,			MULTIPLY,		DIVIDE,		MODULO,		BOR,		BAND,
-		   SHIFTLEFTEQUAL,	SHIFTRIGHTEQUAL,	OREQUAL,		ANDEQUAL,		XOREQUAL,	PLUSEQUAL,	MINUSEQUAL,	MULTIPLYEQUAL,
-		   DIVIDEEQUAL,		MODULOEQUAL,		BOREQUAL,		BANDEQUAL,		QUESTION,	COLON),
-		   SINGLE_ARG(
-		   "~",				"!",				"==",			"!=",			"<<",		">>",		"|",		"&",
-		   "^",				"+",				"-",			"*",			"/",		"%",		"||",		"&&",
-		   "<<=",			">>=",				"|=",			"&=",			"^=",		"+=",		"-=",		"*=",
-		   "/=",			"%=",				"||=",			"&&=",			"?",		":"));
-
-/*enum operatorEnum
+class TokenText : public Token
 {
+	std::string text;
+public:
+	TokenText(std::string text)
+		: text(text)
+	{
+	}
 
-};*/
+	virtual Token *Create(std::string str)
+	{
+	}
+};
+
+class TokenString : public Token
+{
+	std::string text;
+public:
+	TokenString(std::string text)
+		: text(text)
+	{
+	}
+
+	virtual Token *Create(std::string str)
+	{
+	}
+};
+
+class TokenChar : public Token
+{
+	char c;
+public:
+	TokenChar(char c)
+		: c(c)
+	{
+	}
+
+	virtual Token *Create(std::string str)
+	{
+	}
+
+	char getChar()
+	{
+		return c;
+	}
+};
+

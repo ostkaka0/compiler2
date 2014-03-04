@@ -81,6 +81,10 @@
     <ClInclude Include="Parser.h" />
     <ClInclude Include="Scanner.h" />
     <ClInclude Include="Tokens.h" />
+    <ClInclude Include="Tokens_FAIL.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Tokens.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
