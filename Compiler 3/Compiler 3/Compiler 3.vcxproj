@@ -78,13 +78,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CodeGenerator.h" />
+    <ClInclude Include="Node.h" />
+    <ClInclude Include="Node_bad.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="Scanner.h" />
     <ClInclude Include="Tokens.h" />
     <ClInclude Include="Tokens_FAIL.h" />
+    <ClInclude Include="VM.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Parser.cpp" />
+    <ClCompile Include="Scanner.cpp" />
     <ClCompile Include="Tokens.cpp" />
+    <ClCompile Include="VM.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

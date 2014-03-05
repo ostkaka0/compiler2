@@ -1,7 +1,18 @@
-#include <queue>
+#pragma once
+
+#include <vector>
+
+class Token;
+class Expression;
+class Statement;
 
 class Parser
 {
-	Expr *ParseExpr(std::queue<Token*> *tokens);
-	Stmt *ParseStmt(std::queue<Token*> *tokens);
-}
+	long myIndex;
+	Expression *stackExpr;
+
+public:
+	Parser();
+	Expression *ParseExpr(std::vector<Token*> tokens, int index);
+	std::vector<Statement*> ParseStmt(std::vector<Token*> tokens, bool multiStmts);
+};

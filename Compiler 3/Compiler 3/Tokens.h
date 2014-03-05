@@ -1,6 +1,9 @@
+#pragma once
+
 #include <string>
 #include <vector>
 #include <iostream>
+#include <sstream>
 
 class Token;
 
@@ -8,6 +11,8 @@ class Token
 {
 public:
 	virtual Token *Create(std::string str)=0;
+
+	virtual std::string toString()=0;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -16,24 +21,26 @@ public:
 
 enum ETokenOperator
 {
-	NOT = 0,			BNOT,				EQUAL,			NOTEQUAL,		SHIFTLEFT,	SHIFTRIGHT,	OR,			AND,
-	XOR,				PLUS,				MINUS,			MULTIPLY,		DIVIDE,		MODULO,		BOR,		BAND,
-	SHIFTLEFTEQUAL,		SHIFTRIGHTEQUAL,	OREQUAL,		ANDEQUAL,		XOREQUAL,	PLUSEQUAL,	MINUSEQUAL,	MULTIPLYEQUAL,
-	DIVIDEEQUAL,		MODULOEQUAL,		BOREQUAL,		BANDEQUAL,		QUESTION,	COLON,		SEMICOLON,
+	NOT = 0,			BNOT,				EQUAL,				NOTEQUAL,		SHIFTLEFT,		SHIFTRIGHT,		OR,				AND,
+	XOR,				PLUS,				MINUS,				MULTIPLY,		DIVIDE,			MODULO,			BOR,			BAND,
+	ASSIGN,				SHIFTLEFTASSIGN,	SHIFTRIGHTASSIGN,	ORASSIGN,		ANDASSIGN,		XORASSIGN,		PLUSASSIGN,		MINUSASSIGN,
+	MULTIPLYASSIGN,		DIVIDEASSIGN,		MODULOASSIGN,		BORASSIGN,		BANDASSIGN,		QUESTION,		COLON,			SEMICOLON,
 
-	LEFTPARENTHESIS,	RIGHTPARENTHESIS,	LEFTCURLYBRACE,		RIGHTCURLYBRACE,
-	LEFTSQUAREBRACKET,	RIGHTSQUAREBRACKET,	LEFTANGLEBRACKET,	RIGHTANGLEBRACKET
+	LEFTPARENTHESIS,	RIGHTPARENTHESIS,		LEFTCURLYBRACE,			RIGHTCURLYBRACE,
+	LEFTSQUAREBRACKET,	RIGHTSQUAREBRACKET,		LEFTANGLEBRACKET,	RIGHTANGLEBRACKET,
+
+	END
 };
 
-std::string TokenOperatorNames[] =
+const std::string TokenOperatorNames[] =
 {
-	"~",				"!",				"==",			"!=",			"<<",		">>",		"|",		"&",
-	"^",				"+",				"-",			"*",			"/",		"%",		"||",		"&&",
-	"<<=",				">>=",				"|=",			"&=",			"^=",		"+=",		"-=",		"*=",
-	"/=",				"%=",				"||=",			"&&=",			"?",		":",		";",
+	"~",				"!",				"==",				"!=",			"<<",			">>",			"|",			"&",
+	"^",				"+",				"-",				"*",			"/",			"%",			"||",			"&&",
+	"=",				"<<=",				">>=",				"|=",			"&=",			"^=",			"+=",			"-=",
+	"*=",				"/=",				"%=",				"||=",			"&&=",			"?",			":",			";",
 
-	"(",				")",				"{",				"}",
-	"[",				"]",				"<",				">",
+	"(",				")",					"{",					"}",
+	"[",				"]",					"<",					">",
 };
 
 class TokenOperator : public Token
@@ -42,16 +49,16 @@ class TokenOperator : public Token
 public:
 	TokenOperator(std::string text)
 	{
-		for (int i = 0; i < sizeof(TokenOperatorNames); i++)
+		for (int i = 0; i < ETokenOperator::END; i++)
 		{
 			if (TokenOperatorNames[i] == text)
 			{
-				tokenOperator = (ETokenOperator)i;
+				tokenOperator = static_cast<ETokenOperator>(i);
+				return;
 			}
-			return;
+			
 		}
 
-		std::cout << "Invalid operator: " << text << ".\n";
 		std::cerr << "Invalid operator: " << text << ".\n";
 		std::cin.get();
 		exit(-1);
@@ -64,7 +71,12 @@ public:
 
 	virtual Token *Create(std::string str)
 	{
-		
+		return nullptr;
+	}
+
+	virtual std::string toString()
+	{
+		return "<operator>(\"" + TokenOperatorNames[tokenOperator] + "\")";
 	}
 };
 
@@ -79,6 +91,17 @@ public:
 
 	virtual Token *Create(std::string str)
 	{
+		return nullptr;
+	}
+
+	virtual std::string toString()
+	{
+		return "<identifier>(" + text + ")";
+	}
+
+	const std::string getText()
+	{
+		return text;
 	}
 };
 
@@ -93,6 +116,12 @@ public:
 
 	virtual Token *Create(std::string str)
 	{
+		return nullptr;
+	}
+
+	virtual std::string toString()
+	{
+		return "<string>(\"" + text + "\")";
 	}
 };
 
@@ -107,11 +136,43 @@ public:
 
 	virtual Token *Create(std::string str)
 	{
+		return nullptr;
+	}
+
+	virtual std::string toString()
+	{
+		return "<char>(\'" + static_cast<std::ostringstream*>( &(std::ostringstream() << c) )->str() + "\')";
 	}
 
 	char getChar()
 	{
 		return c;
 	}
+
+
 };
 
+class TokenInteger : public Token
+{
+	int integer;
+public:
+	TokenInteger(int integer)
+		: integer(integer)
+	{
+	}
+
+	virtual Token *Create(std::string str)
+	{
+		return nullptr;
+	}
+
+	virtual std::string toString()
+	{
+		return "<integer>(" + static_cast<std::ostringstream*>( &(std::ostringstream() << integer) )->str() + ")";
+	}
+
+	int getInteger()
+	{
+		return integer;
+	}
+};

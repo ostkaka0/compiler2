@@ -1,3 +1,5 @@
+#pragma once
+
 class Expr;
 
 class CodeGenerator

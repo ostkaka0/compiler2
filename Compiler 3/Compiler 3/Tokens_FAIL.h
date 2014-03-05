@@ -1,21 +1,21 @@
-#ifdef WANT_TO_USE_FILE
+#ifdef WANodeT_TO_USE_FILE
 #include <string>
 
 class Token;
 
-#define SINGLE_ARG(...) __VA_ARGS__
+#define SINodeGLE_ARG(...) __VA_ARGS__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////// Metaprogrammerad kod under test ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define ENUM_CLASS(_name,_enum,_enumstring) \
+#define ENodeUM_CLASS(_name,_enum,_enumstring) \
 class _name : public Token\
 {\
 public:\
 	static enum Enum\
 	{
 		_enum,\
-		_ENUM_END\
+		_ENodeUM_ENodeD\
 	};\
 	static std::string *enumstrings;\
 	_name::Enum Value;\
@@ -27,14 +27,14 @@ public:\
 	\
 	static void init()\
 	{\
-		_name::enumstrings = new std::string[_name::Enum::_ENUM_END];\
+		_name::enumstrings = new std::string[_name::Enum::_ENodeUM_ENodeD];\
 		std::string tempstring[] = { _enumstring };\
 		_name::enumstrings = tempstring;\
 	}\
 
 	virtual Token *Create(std::string str)\
 	{\
-		for (unsigned char i = 0; i < _name::Enum::_ENUM_END; ++i)\
+		for (unsigned char i = 0; i < _name::Enum::_ENodeUM_ENodeD; ++i)\
 			{\
 				if (enumstrings[i] == str)\
 				{\
@@ -86,7 +86,7 @@ public:
 	static enum Enum
 	{
 		a= 0,
-		_ENUM_END
+		_ENodeUM_ENodeD
 	};
 	static std::string *enumstrings;
 	_name::Enum Value;
@@ -98,14 +98,14 @@ public:
 	
 	static void init()
 	{
-		_name::enumstrings = new std::string[_name::Enum::_ENUM_END];
+		_name::enumstrings = new std::string[_name::Enum::_ENodeUM_ENodeD];
 		std::string tempstring[] = {"_enumstring"};
 		_name::enumstrings = tempstring;
 	}
 
 	virtual Token *Create(std::string str)
 	{
-		for (unsigned char i = 0; i < _name::Enum::_ENUM_END; ++i)
+		for (unsigned char i = 0; i < _name::Enum::_ENodeUM_ENodeD; ++i)
 			{
 				if (enumstrings[i] == str)
 				{
@@ -122,15 +122,15 @@ public:
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //Under test->
 
-//ENUM_CLASS(TESTMOJDFS, AETT, "AETT");
+//ENodeUM_CLASS(TESTMOJDFS, AETT, "AETT");
 
-ENUM_CLASS(tOperator,
-		   SINGLE_ARG(
-		   NOT = 0,			BNOT,				EQUAL,			NOTEQUAL,		SHIFTLEFT,	SHIFTRIGHT,	OR,			AND,
-		   XOR,				PLUS,				MINUS,			MULTIPLY,		DIVIDE,		MODULO,		BOR,		BAND,
-		   SHIFTLEFTEQUAL,	SHIFTRIGHTEQUAL,	OREQUAL,		ANDEQUAL,		XOREQUAL,	PLUSEQUAL,	MINUSEQUAL,	MULTIPLYEQUAL,
-		   DIVIDEEQUAL,		MODULOEQUAL,		BOREQUAL,		BANDEQUAL,		QUESTION,	COLON),
-		   SINGLE_ARG(
+ENodeUM_CLASS(tOperator,
+		   SINodeGLE_ARG(
+		   NodeOT = 0,			BNodeOT,				EQUAL,			NodeOTEQUAL,		SHIFTLEFT,	SHIFTRIGHT,	OR,			ANodeD,
+		   XOR,				PLUS,				MINodeUS,			MULTIPLY,		DIVIDE,		MODULO,		BOR,		BANodeD,
+		   SHIFTLEFTEQUAL,	SHIFTRIGHTEQUAL,	OREQUAL,		ANodeDEQUAL,		XOREQUAL,	PLUSEQUAL,	MINodeUSEQUAL,	MULTIPLYEQUAL,
+		   DIVIDEEQUAL,		MODULOEQUAL,		BOREQUAL,		BANodeDEQUAL,		QUESTIONode,	COLONode),
+		   SINodeGLE_ARG(
 		   "~",				"!",				"==",			"!=",			"<<",		">>",		"|",		"&",
 		   "^",				"+",				"-",			"*",			"/",		"%",		"||",		"&&",
 		   "<<=",			">>=",				"|=",			"&=",			"^=",		"+=",		"-=",		"*=",
