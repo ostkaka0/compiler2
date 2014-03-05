@@ -76,7 +76,7 @@ public:
 
 	virtual std::string toString()
 	{
-		return "<operator>(\"" + TokenOperatorNames[tokenOperator] + "\")";
+		return "operator: \t" + TokenOperatorNames[tokenOperator];
 	}
 };
 
@@ -96,7 +96,7 @@ public:
 
 	virtual std::string toString()
 	{
-		return "<identifier>(" + text + ")";
+		return "identifier: \t" + text;
 	}
 
 	const std::string getText()
@@ -121,7 +121,7 @@ public:
 
 	virtual std::string toString()
 	{
-		return "<string>(\"" + text + "\")";
+		return "string: \t\"" + text + "\"";
 	}
 };
 
@@ -141,7 +141,7 @@ public:
 
 	virtual std::string toString()
 	{
-		return "<char>(\'" + static_cast<std::ostringstream*>( &(std::ostringstream() << c) )->str() + "\')";
+		return "char: \t\'" + static_cast<std::ostringstream*>( &(std::ostringstream() << c) )->str() + "\'";
 	}
 
 	char getChar()
@@ -168,7 +168,7 @@ public:
 
 	virtual std::string toString()
 	{
-		return "<integer>(" + static_cast<std::ostringstream*>( &(std::ostringstream() << integer) )->str() + ")";
+		return "integer: \t" + static_cast<std::ostringstream*>( &(std::ostringstream() << integer) )->str();
 	}
 
 	int getInteger()
