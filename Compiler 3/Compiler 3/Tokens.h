@@ -13,6 +13,23 @@ public:
 	virtual Token *Create(std::string str)=0;
 
 	virtual std::string toString()=0;
+
+	bool compare(Token *other) {
+		return (typeid(*this).hash_code() == typeid(*other).hash_code());
+	}
+};
+
+class TokenNull : public Token
+{
+	virtual Token *Create(std::string str)
+	{
+
+	}
+
+	virtual std::string toString()
+	{
+		return "NULL";
+	}
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

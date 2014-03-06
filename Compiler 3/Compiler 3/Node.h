@@ -15,6 +15,10 @@ public:
     virtual ~Node() {}
 
 	virtual std::string toString() { return " "; }
+
+	bool compare(Token *other) {
+		return (typeid(*this).hash_code() == typeid(*other).hash_code());
+	}
 	//virtual Value* codeGen(CodeGenContext& context) { return nullptr; }
 	//virtual Node *Load(std::stringstream &stream) { return nullptr; }
 	

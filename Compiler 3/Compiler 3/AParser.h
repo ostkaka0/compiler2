@@ -1,4 +1,17 @@
-class Parser : AParser {
+#include "IParser.h"
+
+class TokenPreprocessor;//
+
+class TokenOperator;
+class TokenText;
+class TokenString;
+class TokenChar;
+class TokenInteger;
+class TokenFloat;//
+class tokenDouble;//
+
+class AParser : public IParser
+{
 protected:
 #pragma region Parse_Statement
 
@@ -23,6 +36,6 @@ protected:
 	//virtual std::vector<Expression*> parseDouble(TokenDouble *token)=0;
 #pragma endregion
 public:
-	std::vector<Statement*> ParseStmt(std::vector<Token*> tokens, bool multiStmts);
-	Expression *ParseExpr(std::vector<Token*> tokens, int index);
+	virtual std::vector<Statement*> ParseStmt(std::vector<Token*> tokens, bool multiStmts)=0;
+	virtual Expression *ParseExpr(std::vector<Token*> tokens, int index)=0;
 };

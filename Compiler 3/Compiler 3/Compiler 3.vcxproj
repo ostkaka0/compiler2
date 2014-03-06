@@ -77,10 +77,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AParser.h" />
     <ClInclude Include="CodeGenerator.h" />
+    <ClInclude Include="IParser.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Node_bad.h" />
     <ClInclude Include="Parser.h" />
+    <ClInclude Include="Parser_old.h" />
     <ClInclude Include="Scanner.h" />
     <ClInclude Include="Tokens.h" />
     <ClInclude Include="Tokens_FAIL.h" />
@@ -89,6 +92,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Parser.cpp" />
+    <ClCompile Include="Parser_old.cpp" />
     <ClCompile Include="Scanner.cpp" />
     <ClCompile Include="Tokens.cpp" />
     <ClCompile Include="VM.cpp" />
