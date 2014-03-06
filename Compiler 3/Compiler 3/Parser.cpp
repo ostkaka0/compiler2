@@ -54,6 +54,8 @@ vector<Statement*> Parser::ParseStmt(std::vector<Token*> tokens, bool multiStmts
 						break;
 				}
 				else break;
+				std::vector<Statement*> ifStatement;
+
 				myIndex++;
 
 				expression = ParseExpr(tokens, myIndex);
@@ -67,8 +69,21 @@ vector<Statement*> Parser::ParseStmt(std::vector<Token*> tokens, bool multiStmts
 				else break;
 				myIndex++;
 
+				ifStatement = ParseStmt(tokens, false);
+
+				// else
+				if (typeid(*tokens[myIndex]) == typeid(TokenText))
+				{
+					TokenText *elseText = (TokenText*)tokens[myIndex];
+					if (elseText->getText() == "else")
+					{
+						statements.push_back(new StmtIfElse((ExprBooleanExpr*)expression, ifStatement, ParseStmt(tokens, false)));
+						continue;
+					}
+				}
+
 				if (dynamic_cast<ExprBooleanExpr*>(expression))
-					statements.push_back(new StmtIf((ExprBooleanExpr*)expression, ParseStmt(tokens, false)));
+					statements.push_back(new StmtIf((ExprBooleanExpr*)expression, ifStatement));
 				else break;
 			}
 		}
@@ -79,7 +94,10 @@ vector<Statement*> Parser::ParseStmt(std::vector<Token*> tokens, bool multiStmts
 			{
 				case ETokenOperator::SEMICOLON:
 					myIndex++;
-					continue;
+					if (multiStmts)
+						continue;
+					else
+						return statements;
 
 				case ETokenOperator::LEFTCURLYBRACE:
 					{
@@ -98,7 +116,7 @@ vector<Statement*> Parser::ParseStmt(std::vector<Token*> tokens, bool multiStmts
 
 		expression = ParseExpr(tokens, myIndex);
 	}
-	while(myIndex < tokens.size() && multiStmts);
+	while(myIndex < tokens.size());
 
 	return statements;
 }
@@ -115,6 +133,37 @@ Expression *Parser::ParseExpr(std::vector<Token*> tokens, int index)
 
 		expr = new ExprInteger(token->getInteger());
 	}
+	else if (tokenType == &typeid(TokenText))
+	{
+		TokenText *token = (TokenText*)tokens[index];
+
+		if (token->getText() == "true")
+			expr = new ExprBoolean(true);
+		else if (token->getText() == "true")
+			expr = new ExprBoolean(false);
+		else
+		{
+			//method
+		}
+	}
+	else if (tokenType == &typeid(TokenString))
+	{
+		TokenString *token = (TokenString*)tokens[index];
+
+		expr = new ExprString(token->getString());
+	}
+	/*else if (tokenType == &typeid(TokenChar))
+	{
+		TokenChar *token = (TokenChar*)tokens[index];
+
+		expr = new ExprChar(token->getChar());
+	}
+	else if (tokenType == &typeid(TokenDouble))
+	{
+		TokenDouble *token = (TokenDouble*)tokens[index];
+
+		expr = new ExprDouble(token->getDouble());
+	}*/
 	else if(tokenType == &typeid(TokenOperator))
 	{
 		TokenOperator *token = (TokenOperator*)tokens[index];

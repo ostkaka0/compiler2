@@ -123,6 +123,11 @@ public:
 	{
 		return "string: \t\"" + text + "\"";
 	}
+
+	std::string getString()
+	{
+		return text;
+	}
 };
 
 class TokenChar : public Token

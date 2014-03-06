@@ -44,6 +44,11 @@ public:
 	virtual int run()=0;
 };
 
+class ExprStringExpr : public Expression {
+public:
+	virtual std::string run()=0;
+};
+
 class ExprDoubleExpr : public Expression {
 public:
 	virtual double run()=0;
@@ -73,7 +78,9 @@ public:
     ExprInteger(long long value) : value(value) { }
 	virtual Value* codeGen(CodeGenContext &context) { return nullptr; }
 	virtual Node *Load(std::stringstream &stream) { return nullptr; }
-	virtual std::string toString() { return static_cast<std::ostringstream*>( &(std::ostringstream() << value) )->str(); }
+	virtual std::string toString() {
+		return static_cast<std::ostringstream*>( &(std::ostringstream() << value) )->str();
+	}
 
 	virtual bool equal(Expression *other) {
 		if (Expression::equal(other))
@@ -84,6 +91,19 @@ public:
 		return value;
 	}
     //virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
+class ExprString : public ExprStringExpr {
+public:
+	std::string value;
+	ExprString(std::string value) : value(value) { }
+	virtual std::string toString() {
+		return value;
+	}
+
+	virtual std::string run() {
+		return value;
+	}
 };
 
 class ExprDouble : public ExprDoubleExpr {
@@ -151,7 +171,7 @@ public:
 		std::string str = "if <expr>(" + exprBooleanExpr->toString() + ")";
 
 			for (auto stmt : statements)
-				str += ", <stmt>(" + stmt->toString() + ");";
+				str += ", <stmt>(" + stmt->toString() + ")";
 
 		return str;
 	}
@@ -162,6 +182,41 @@ public:
 				stmt->run();
 	}
 
+};
+
+class StmtIfElse : public StmtIf {
+public:
+	std::vector<Statement*> elseStatements;
+
+	StmtIfElse(ExprBooleanExpr *exprBooleanExpr, std::vector<Statement*> statements, std::vector<Statement*> elseStatements)
+		: StmtIf(exprBooleanExpr, statements)
+		, elseStatements(elseStatements) {
+	}
+
+	virtual std::string toString() {
+		std::string str = "if <expr>(" + exprBooleanExpr->toString() + ")";
+
+			for (auto stmt : statements)
+				str += ", <stmt>(" + stmt->toString() + ")";
+
+			str += "\t else";
+
+			for (auto stmt : elseStatements)
+				str += ", <stmt>(" + stmt->toString() + ")";
+
+		return str;
+	}
+
+	virtual void run() {
+		if (exprBooleanExpr->run()) {
+			for (auto stmt : statements)
+				stmt->run();
+		}
+		else {
+			for (auto stmt : elseStatements)
+				stmt->run();
+		}
+	}
 };
 
 class StmtPrint : public Statement {
@@ -183,6 +238,9 @@ public:
 
 		else if (dynamic_cast<ExprIntegerExpr*>(expr))
 			std::cout << ((ExprIntegerExpr*)expr)->run() << std::endl;
+
+		else if (dynamic_cast<ExprStringExpr*>(expr))
+			std::cout << ((ExprStringExpr*)expr)->run() << std::endl;
 
 		else if (dynamic_cast<ExprDoubleExpr*>(expr))
 			std::cout << ((ExprDoubleExpr*)expr)->run() << std::endl;

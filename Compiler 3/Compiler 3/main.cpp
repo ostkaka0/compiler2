@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 	SetConsoleTitle(L"Ostkaka's Compiler");
 	for (int i = 0; i < argc; i++)
 	{
-		//cout << i << ": " << argv[i] << std::endl;
+		cout << i << ": " << argv[i] << std::endl;
 	}
 
 	cout << std::endl << "Compiling..." << endl << endl;
