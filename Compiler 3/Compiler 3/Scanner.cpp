@@ -74,7 +74,7 @@ vector<Token*> Scanner::Scan(ifstream &stream)
 			stringstream ss;
 
 			while (!stream.eof())
-			{
+			{ 
 				stream >> c;
 
 				if (c == '"')
