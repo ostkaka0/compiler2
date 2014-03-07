@@ -5,7 +5,7 @@
 #include <tchar.h>
 
 #include "Scanner.h"
-#include "Parser.h"
+#include "Parser_old.h"
 
 #include "Node.h"
 #include "Tokens.h"
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	{
 		ifstream stream;
 		Scanner scanner;
-		Parser parser;
+		Parser_old parser;
 		vector<Token*> tokens;
 		vector<Statement*> code;
 
