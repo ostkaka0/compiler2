@@ -49,6 +49,11 @@ namespace Server
                     string[] args = data.Split(' ');
                     switch (args.First().ToLower())
                     {
+                        case "/commands":
+                        case "/help":
+                            client.Send("Commands: /help, /disconnect, /spam");
+                            break;
+
                         case "/disconnect":
                             Console.WriteLine(source.ToString() + " disconnected!");
                             broadcast(client.ToString() + " disconnected!", client);
