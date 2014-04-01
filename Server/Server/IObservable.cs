@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public interface Observable
+    public interface IObservable
     {
         void notifyObservers(object source, string data);
-        void registerObserver(Observer observer);
-        void unregisterObserver(Observer observer);
+        void registerObserver(IObserver observer);
+        void unregisterObserver(IObserver observer);
     }
 }

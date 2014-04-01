@@ -6,22 +6,22 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class Publisher : Observable
+    public class Publisher : IObservable
     {
-        List<Observer> observers = new List<Observer>();
+        List<IObserver> observers = new List<IObserver>();
 
         public void notifyObservers(object source, string data)
         {
-            foreach (Observer o in observers)
+            foreach (IObserver o in observers)
                 o.notify(source, data);
         }
 
-        public void registerObserver(Observer observer)
+        public void registerObserver(IObserver observer)
         {
             observers.Add(observer);
         }
 
-        public void unregisterObserver(Observer observer)
+        public void unregisterObserver(IObserver observer)
         {
             observers.Remove(observer);
         }

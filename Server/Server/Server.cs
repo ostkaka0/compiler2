@@ -9,20 +9,22 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class Server : Observer
+    public class Server : IServer, IObserver
     {
         Publisher publisher = new Publisher();
+
         ClientListener clientListener = new ClientListener();
 
         List<Client> connectedClients = new List<Client>();
-        /*Socket listener;
-        IPAddress ip;
 
-        Socket remoteClient;*/
+        CommandFactory commandFactory = new CommandFactory();
 
         public Server()
         {
             publisher.registerObserver(this);
+
+            commandFactory.registerCommand(new CommandLogin());
+            commandFactory.registerCommand(new CommandSpam());
 
             while (true)
             {
@@ -33,95 +35,82 @@ namespace Server
                 lock (connectedClients)
                     connectedClients.Add(client);
 
-                broadcast("Server: " + client.ToString() + " connected!");
+                broadcast(MessageType.MESSAGE, "Server: " + client.Name + " connected!");
             }
         }
 
         public void notify(object source, string data)
         {
-            if (source is Client)
+            if (source is Client && data != "")
             {
                 Client client = (Client)source;
 
+                MessageType messageType = (MessageType)(byte)data[0];
+
                 Console.WriteLine(source.ToString() + "\t " + data);
-                if (data.StartsWith("/"))
+
+                switch (messageType)
                 {
-                    string[] args = data.Split(' ');
-                    switch (args.First().ToLower())
-                    {
-                        case "/commands":
-                        case "/help":
-                            client.Send("Commands: /help, /disconnect, /spam");
-                            break;
-
-                        case "/disconnect":
-                            Console.WriteLine(source.ToString() + " disconnected!");
-                            broadcast(client.ToString() + " disconnected!", client);
-                            client.kill();
-                            lock (connectedClients)
-                                connectedClients.Remove(client);
-                            break;
-
-                        case "/spam":
-                            if (args.Length > 1)
+                    case MessageType.LOGIN:
+                        if (data.Length >= 2)
+                        {
+                            if (client.Name == "")
                             {
-                                int i = 100;
+                                string playerList = "";
+                                client.Name = data.Substring(1);
+                                client.Send(MessageType.MESSAGE, "Yffdlkf\n\r");
 
-                                string spamText = data.Substring(args[0].Length + 1);
 
-                                if (args.Length > 2 && args[1].StartsWith("#") && args[1].Length > 1)
+                                foreach (Client c in connectedClients)
                                 {
-                                    int.TryParse(args[1].Substring(1), out i);
-
-                                    if (i == 0)
+                                    if (c != client && c.Name != "")
                                     {
-                                        client.Send("Invalid amount of spam!");
-                                        break;
+                                        playerList += c.Name + ";";
+                                        c.Send(MessageType.JOIN, client.Name);
                                     }
-                                    else
-                                    {
-                                        spamText = spamText.Substring(args[1].Length + 1);
-                                    }
-
-                                }
-                                else
-                                {
-                                    i = 100;
                                 }
 
-                                broadcast(client.ToString() + " is now spamming...");
+                                client.Send(MessageType.LOGIN, playerList);
+                            }
+                        }
 
-                                for (; i > 0; i--)
-                                {
-                                    broadcast(spamText);
-                                }
+                        break;
 
-                                broadcast(client.ToString() + " just spammed.");
+                    case MessageType.JOIN:
+                        break;
 
+                    case MessageType.LEAVE:
+
+                        break;
+
+                    case MessageType.MESSAGE:
+                        if (data.Length >= 2 && client.Name != "")
+                        {
+                            if (data[1] == '/')
+                            {
+                                ICommand command = commandFactory.CreateCommand(data.Substring(1));
+                                command.Run(this, client);
                             }
                             else
                             {
-                                client.Send("/spam [#amount] <spam text>");
+                                broadcast(MessageType.MESSAGE, client.Name + ": " + data.Substring(1), client);
+                                client.Send(MessageType.MESSAGE, "you: " + data.Substring(1));
                             }
-                            break;
-                            
-                    }
+                        }
+                        break;
                 }
-                else
-                {
-                    broadcast("Server: " + source.ToString() + ": " + data, client);
-                }
+                
             }
         }
 
-        public void broadcast(string message, params Client[] exceptions)
+        public void broadcast(MessageType messageType, string message, params Client[] exceptions)
         {
             lock (connectedClients)
             {
                 foreach (Client c in connectedClients)
                 {
-                    if (!exceptions.Contains(c))
-                        c.Send(message);
+                    if (!exceptions.Contains(c) && c.Name != "")
+                        c.Send(messageType, message);
                 }
             }
         }

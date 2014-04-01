@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public interface Observer
+    public enum MessageType : byte
     {
-        void notify(object source, string data);
+        NULLMESSAGE,
+        LOGIN,
+        JOIN,
+        LEAVE,
+        MESSAGE
     }
 }

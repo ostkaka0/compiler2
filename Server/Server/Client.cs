@@ -14,10 +14,18 @@ namespace Server
         Publisher publisher;
         Socket socket;
         Thread thread;
+        string name;
+
+        public string Name
+        {
+            get { return name; }
+            set { name = value; }
+        }
 
         public Client(Socket socket)
         {
             this.socket = socket;
+            name = "";
         }
 
         ~Client()
@@ -28,7 +36,7 @@ namespace Server
         public void Start(Publisher publisher)
         {
             this.publisher = publisher;
-            this.Send("Welcome!");
+            this.Send(MessageType.MESSAGE, "Welcome!");  
             thread = new Thread(() =>
                 {
                     string data = "";
@@ -45,7 +53,6 @@ namespace Server
                         catch (Exception e)
                         {
                             kill();
-                            publisher.notifyObservers(this, "/disconnect");
                             break;
                         }
 
@@ -67,7 +74,6 @@ namespace Server
                             i = data.IndexOf((char)(26));
                             publisher.notifyObservers(this, data.Substring(0, i));
                             kill();
-                            publisher.notifyObservers(this, "/disconnect");
                             break;
                         }
 
@@ -78,17 +84,19 @@ namespace Server
             thread.Start();
         }
 
-        public void Send(String text)
+        public void Send(MessageType messageType, String text)
         {
             try
             {
-                byte[] bs = Encoding.ASCII.GetBytes(text + "\n\r");
-                socket.Send(bs);
+                List<byte> bs = new List<byte>();
+                bs.Add((byte)messageType);
+                bs.AddRange(Encoding.ASCII.GetBytes(text + "\n\r"));
+                //byte[] bs = 
+                socket.Send(bs.ToArray());
             }
             catch (Exception e)
             {
                 kill();
-                publisher.notifyObservers(this, "/disconnect");
             }
         }
 
@@ -98,6 +106,7 @@ namespace Server
             {
                 socket.Disconnect(false);
                 socket.Close();
+                publisher.notifyObservers(this, "/disconnect");
             }
         }
 
