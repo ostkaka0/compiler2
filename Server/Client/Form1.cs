@@ -11,19 +11,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using Server;
-using System.IO;                                                                                                                
+using Server;                                                                                                                
 
 namespace Client
 {
     public partial class Form1 : Form
     {
         Socket socket;
-        Thread thread;
+        Thread listenerThread;
 
 
         public Form1()
         {
+            listenerThread = new Thread(() => Listen());
+
             InitializeComponent();
         }
 
@@ -45,13 +46,14 @@ namespace Client
 
             socket.Connect(server);
 
-            Listen();
+            lock (listenerThread)
+                listenerThread.Start();
+
         }
 
         private void Listen()
         {
-            thread = new Thread(() =>
-            {
+            
                 string data = "";
                 byte[] b = new byte[256];
 
@@ -71,10 +73,10 @@ namespace Client
 
                     data += Encoding.ASCII.GetString(b, 0, bytesRec);
 
-                    int i = data.IndexOf('\n');
+                    int i = data.IndexOf(Constants.messageBreakChar);
                     while (i > -1)
                     {
-                        HandleMessage(data.Substring(0, i).Replace("\r", "").Replace("\b", ""));//publisher.notifyObservers(this, data.Substring(0, i).Replace("\r", "").Replace("\b", ""));
+                        HandleMessage(data.Substring(0, i));//.Replace("\r", "").Replace("\b", ""));//publisher.notifyObservers(this, data.Substring(0, i).Replace("\r", "").Replace("\b", ""));
                         if (data.Length > i)
                             data = data.Substring(i + 1);
                         else
@@ -92,16 +94,13 @@ namespace Client
 
 
                 }
-
-            });
-            thread.Start();
         }
 
-        private void HandleMessage(string data)//(StringReader ostring)
+        private void HandleMessage(string data)
         {
             this.Invoke(new Action(() =>
                 {
-                    if (data.Length >= 1)//ostring.Length >= 1)
+                    if (data.Length >= 1)
                     {
                         MessageType messageType = MessageType.NULLMESSAGE;
                         messageType = (MessageType)(byte)data.First();//Enum.TryParse<MessageType>(data.First().ToString(), out messageType);
@@ -127,6 +126,13 @@ namespace Client
                                 }
                                 break;
                             case MessageType.LEAVE:
+                                if (Text.Length >= 2)
+                                {
+                                    string name = data.Substring(1);
+
+                                    if(lvUsers.Items.ContainsKey(name))
+                                        lvUsers.Items.RemoveByKey(Name);
+                                }
                                 break;
                             case MessageType.MESSAGE:
                                 if (Text.Length >= 2)
@@ -145,13 +151,27 @@ namespace Client
         private void Send(MessageType messageType, String text)
         {
             socket.Send(new byte[]{(byte)messageType});
-            socket.Send(Encoding.ASCII.GetBytes(text + "\n\r"));
+            socket.Send(Encoding.ASCII.GetBytes(text + Constants.messageBreakChar));
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
             Console.WriteLine(tbLogin.Text.Replace('\n','N').Replace('\r', 'R'));
             Send(MessageType.LOGIN, tbLogin.Text);
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            lock (listenerThread)
+            {
+                if (listenerThread != null)
+                {
+                    listenerThread.Abort();
+                    listenerThread = null;
+
+                    Send(MessageType.LEAVE,"");
+                }
+            }
         }
     }
 }

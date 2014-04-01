@@ -58,7 +58,7 @@ namespace Server
                             {
                                 string playerList = "";
                                 client.Name = data.Substring(1);
-                                client.Send(MessageType.MESSAGE, "Yffdlkf\n\r");
+                                client.Send(MessageType.MESSAGE, "Yffdlkf");
 
 
                                 foreach (Client c in connectedClients)
@@ -80,7 +80,16 @@ namespace Server
                         break;
 
                     case MessageType.LEAVE:
-
+                        if (connectedClients.Contains(client))
+                        {
+                            connectedClients.Remove(client);
+                            foreach (Client c in connectedClients)
+                            {
+                                if (c.Name != "")
+                                    c.Send(MessageType.LEAVE, client.Name);
+                            }
+                            client.kill();
+                        }
                         break;
 
                     case MessageType.MESSAGE:

@@ -51,6 +51,7 @@
     <Compile Include="commands\CommandSpam.cs" />
     <Compile Include="commands\ICommand.cs" />
     <Compile Include="commands\ICommandFactory.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="IObservable.cs" />
     <Compile Include="IObserver.cs" />
     <Compile Include="IServer.cs" />

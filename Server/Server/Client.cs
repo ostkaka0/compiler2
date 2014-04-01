@@ -58,10 +58,10 @@ namespace Server
 
                         data += Encoding.ASCII.GetString(b, 0, bytesRec);
 
-                        int i = data.IndexOf('\n');
+                        int i = data.IndexOf(Constants.messageBreakChar);
                         while (i > -1)
                         {
-                            publisher.notifyObservers(this, data.Substring(0, i).Replace("\r", "").Replace("\b",""));
+                            publisher.notifyObservers(this, data.Substring(0, i));//.Replace("\r", "").Replace("\b",""));
                             if (data.Length > i)
                                 data = data.Substring(i + 1);
                             else
@@ -90,7 +90,7 @@ namespace Server
             {
                 List<byte> bs = new List<byte>();
                 bs.Add((byte)messageType);
-                bs.AddRange(Encoding.ASCII.GetBytes(text + "\n\r"));
+                bs.AddRange(Encoding.ASCII.GetBytes(text + Constants.messageBreakChar));
                 //byte[] bs = 
                 socket.Send(bs.ToArray());
             }
@@ -106,13 +106,13 @@ namespace Server
             {
                 socket.Disconnect(false);
                 socket.Close();
-                publisher.notifyObservers(this, "/disconnect");
+                publisher.notifyObservers(this, ((char)(byte)MessageType.LEAVE).ToString());
             }
         }
 
         public override string ToString()
         {
-            return socket.RemoteEndPoint.ToString();
+            return this.name;
         }
 
     }
